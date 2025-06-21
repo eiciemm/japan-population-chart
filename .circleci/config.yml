@@ -1,0 +1,64 @@
+version: 2.1
+
+executors:
+  awscli_container:
+    docker:
+      - image: amazon/aws-cli:2.15.49
+        environment:
+          AWS_DEFAULT_REGION: ap-northeast-1
+    working_directory: ~/project
+
+  nodejs_container:
+    docker:
+      - image: cimg/node:21.6.0
+    working_directory: ~/project
+
+jobs:
+  build-and-test:
+    executor: nodejs_container
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install Dependencies
+          command: npm install --legacy-peer-deps
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Run build for the application
+          command: npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+  deploy:
+    executor: awscli_container
+    environment:
+      AWS_S3_BUCKET_NAME: 'population-chart-matsui'
+    steps:
+      - run:
+          name: Install tar and gzip
+          command: yum install -y tar gzip
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Deploy to S3
+          command: |
+            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
+            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+            aws s3 sync dist s3://${AWS_S3_BUCKET_NAME}/ --exact-timestamps --delete
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-and-test
+      - deploy:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: main
