@@ -41,26 +41,44 @@ export default defineComponent({
 
     const options = {
       responsive: true,
-      maintainAspectRatio: false
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
     }
 
-    // todo スタイルが当たらないので、調査
-    const styles = {
-      color: '#FFFFFF',
-      background: '#000000'
-    }
+    const chartPlugins = [
+      {
+        id: 'chartAreaBackground',
+        beforeDraw(chart: any) {
+          const { ctx, chartArea } = chart
+          if (!chartArea) return
+          ctx.save()
+          ctx.fillStyle = '#dcdcdc'
+          ctx.fillRect(
+            chartArea.left,
+            chartArea.top,
+            chartArea.right - chartArea.left,
+            chartArea.bottom - chartArea.top
+          )
+          ctx.restore()
+        }
+      }
+    ]
 
     return {
       data,
       options,
-      styles
+      chartPlugins
     }
   }
 })
 </script>
 
 <template>
-  <Line :data="data" :options="options" :width="900" :height="450" :styles="styles" />
+  <Line :data="data" :options="options" :width="1200" :height="450" :plugins="chartPlugins" />
 </template>
 
 <style scoped>

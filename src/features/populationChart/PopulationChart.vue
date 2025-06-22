@@ -212,6 +212,7 @@ export default defineComponent({
 
 <style scoped>
 .all-wrapper {
+  height: 100vh;
   background: v-bind(background);
   color: v-bind(color);
 }
@@ -222,7 +223,7 @@ export default defineComponent({
 }
 .chart {
   width: 94%;
-  margin: 20px auto;
+  margin: 0 auto;
   padding: 15px 0;
   display: flex;
   justify-content: center;

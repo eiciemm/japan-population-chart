@@ -11,6 +11,10 @@ export default defineComponent({
     checked: {
       type: Boolean,
       default: false
+    },
+    accentColor: {
+      type: String,
+      default: '#696969'
     }
   },
   emits: ['onChange'],
@@ -41,7 +45,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="wrapper">
+  <div class="wrapper" :style="{ '--accent-color': accentColor }">
     <input
       :id="label"
       v-model="isCheckedComputed"
@@ -61,12 +65,16 @@ export default defineComponent({
 .checkbox {
   width: 16px;
   height: 16px;
+  accent-color: var(--accent-color, #696969);
 }
 label {
   margin-left: 4px;
   font-size: 13.5px;
 }
-
+.checkbox:checked + label {
+  color: var(--accent-color, #696969);
+  font-weight: bold;
+}
 @media (min-width: 1024px) {
 }
 </style>

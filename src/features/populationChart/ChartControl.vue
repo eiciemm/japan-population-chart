@@ -118,6 +118,7 @@ export default defineComponent({
           <CheckBox
             :label="prefecture.prefName"
             :checked="prefecture.checked"
+            :accent-color="prefecture.borderColor"
             @on-change="(checked: boolean) => selectByPrefecture(checked, prefecture, key)"
           />
         </div>
